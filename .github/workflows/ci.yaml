@@ -21,4 +21,4 @@ jobs:
         run: dart test
 
       - name: Publish
-        run: dart pub pub publish --dry-run
+        run: dart pub publish --dry-run
