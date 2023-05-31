@@ -17,5 +17,8 @@ jobs:
       - name: Analyse
         run: dart analyze --fatal-infos --fatal-warnings .
 
+      - name: Run tests
+        run: dart test
+
       - name: Publish
         run: dart pub pub publish --dry-run
