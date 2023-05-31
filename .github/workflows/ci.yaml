@@ -1,0 +1,21 @@
+name: CI
+
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+.[0-9]+*'
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: dart-lang/setup-dart@v1
+      - name: Install dependencies
+        run: dart pub get
+
+      - name: Analyse
+        run: dart analyze --fatal-infos --fatal-warnings .
+
+      - name: Publish
+        run: dart pub pub publish --dry-run
