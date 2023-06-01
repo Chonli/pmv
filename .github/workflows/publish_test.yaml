@@ -6,7 +6,7 @@ on:
       - 'v[0-9]+.[0-9]+.[0-9]+*'
 
 jobs:
-  publish:
+  test_publish:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -20,5 +20,5 @@ jobs:
       - name: Run tests
         run: dart test
 
-      - name: Publish
+      - name: Publish test
         run: dart pub publish --dry-run
