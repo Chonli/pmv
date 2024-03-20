@@ -4,7 +4,7 @@ import 'package:glob/list_local_fs.dart';
 import 'package:mason_logger/mason_logger.dart';
 import 'package:path/path.dart';
 import 'package:pmv/src/extensions/string.dart';
-import 'package:pubspec/pubspec.dart';
+import 'package:pubspec2/pubspec2.dart';
 
 class ApplySubPackageCommand extends Command<int> {
   ApplySubPackageCommand(this._logger) {

@@ -3,14 +3,15 @@ import 'dart:io';
 import 'package:args/command_runner.dart';
 import 'package:mason_logger/mason_logger.dart';
 import 'package:pub_updater/pub_updater.dart';
-import 'package:pubspec/pubspec.dart';
+import 'package:pubspec2/pubspec2.dart';
 
 class UpgradeRootPackageCommand extends Command<int> {
   UpgradeRootPackageCommand(this._logger) {
     argParser.addOption(
       'source',
       abbr: 's',
-      help: 'The path of the reference pubspec file (pmv_pubspec.yaml by default).',
+      help:
+          'The path of the reference pubspec file (pmv_pubspec.yaml by default).',
       defaultsTo: './pmv_pubspec.yaml',
     );
     argParser.addFlag(
@@ -33,7 +34,8 @@ class UpgradeRootPackageCommand extends Command<int> {
   @override
   Future<int> run() async {
     final pubUpdater = PubUpdater();
-    final progress = _logger.progress("Upgrade reference pubspec package version in progress");
+    final progress = _logger
+        .progress("Upgrade reference pubspec package version in progress");
     final rootFile = argResults?['source'] as String;
     final forceUpgradeOverrides = argResults?['upgrade-overrides'] as bool;
 
@@ -47,7 +49,7 @@ class UpgradeRootPackageCommand extends Command<int> {
       progress.update('$key new version: $latestVersion');
       rootPubSpec.dependencies.update(
         key,
-        (value) => HostedReference.fromJson(latestVersion),
+        (value) => HostedReference.fromJson('^$latestVersion'),
       );
     });
 
@@ -57,7 +59,7 @@ class UpgradeRootPackageCommand extends Command<int> {
       progress.update('$key new version: $latestVersion');
       rootPubSpec.devDependencies.update(
         key,
-        (value) => HostedReference.fromJson(latestVersion),
+        (value) => HostedReference.fromJson('^$latestVersion'),
       );
     });
 
@@ -69,14 +71,24 @@ class UpgradeRootPackageCommand extends Command<int> {
         progress.update('$key new version: $latestVersion');
         rootPubSpec.dependencyOverrides.update(
           key,
-          (value) => HostedReference.fromJson(latestVersion),
+          (value) => HostedReference.fromJson('^$latestVersion'),
         );
       });
     }
 
     // Save in file
+    const pubSpecName = './pubspec.yaml';
+    if (File(pubSpecName).existsSync()) {
+      File(pubSpecName).renameSync('$pubSpecName.bak');
+    }
+
     await rootPubSpec.save(Directory.current);
-    File('./pubspec.yaml').renameSync(rootFile);
+    File(pubSpecName).renameSync(rootFile);
+
+    if (File('$pubSpecName.bak').existsSync()) {
+      File('$pubSpecName.bak').renameSync(pubSpecName);
+    }
+
     progress.complete('Upgrade Done!');
 
     return ExitCode.success.code;

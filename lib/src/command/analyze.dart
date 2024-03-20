@@ -7,7 +7,7 @@ import 'package:pmv/src/entities/dependency.dart';
 import 'package:pmv/src/extensions/dependency.dart';
 import 'package:pmv/src/extensions/string.dart';
 import 'package:pmv/src/file.dart';
-import 'package:pubspec/pubspec.dart';
+import 'package:pubspec2/pubspec2.dart';
 
 class AnalyzeSubPackageCommand extends Command<int> {
   AnalyzeSubPackageCommand(this._logger) {
