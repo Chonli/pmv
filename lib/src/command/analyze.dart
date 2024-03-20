@@ -5,6 +5,7 @@ import 'package:mason_logger/mason_logger.dart';
 import 'package:path/path.dart';
 import 'package:pmv/src/entities/dependency.dart';
 import 'package:pmv/src/extensions/dependency.dart';
+import 'package:pmv/src/extensions/string.dart';
 import 'package:pmv/src/file.dart';
 import 'package:pubspec/pubspec.dart';
 
@@ -26,6 +27,11 @@ class AnalyzeSubPackageCommand extends Command<int> {
       negatable: false,
       help: 'In result report, show only package in multiple sub pubspec',
     );
+    argParser.addOption(
+      'excludePaths',
+      help: 'The list of path to exclude',
+      defaultsTo: '.fvm,.symlinks',
+    );
   }
 
   final Logger _logger;
@@ -44,34 +50,41 @@ class AnalyzeSubPackageCommand extends Command<int> {
     final output = argResults?['output'] as String;
     final hideFile = argResults?['hide-file'] as bool;
     final multiOnly = argResults?['multi-only'] as bool;
+    final excludePaths = (argResults?['excludePaths'] as String).split(',');
+
+    print(excludePaths);
 
     Map<String, Dependency> allDependencies = {};
     Map<String, Dependency> allDevDependencies = {};
     Map<String, Dependency> allOverrideDependencies = {};
 
-    final progress = _logger.progress('Analyze sub project pubspec in progress');
+    final progress =
+        _logger.progress('Analyze sub project pubspec in progress');
 
     try {
       // analyze dependencies
       final pubspecFiles = Glob(join('.', '**', 'pubspec.yaml'));
       for (final entity in pubspecFiles.listSync()) {
-        final pubSpec = await PubSpec.loadFile(entity.path);
-        final projectName = pubSpec.name ?? 'unknow';
+        if (entity.path.isNotExclude(excludePaths)) {
+          progress.update('Analyze file ${entity.path}');
+          final pubSpec = await PubSpec.loadFile(entity.path);
+          final projectName = pubSpec.name ?? 'unknow';
 
-        allDependencies = _analyzePubFile(
-          projectName: projectName,
-          pubSpecDep: pubSpec.dependencies,
-          old: allDependencies,
-        );
-        allDevDependencies = _analyzePubFile(
+          allDependencies = _analyzePubFile(
             projectName: projectName,
-            pubSpecDep: pubSpec.devDependencies,
-            old: allDevDependencies);
-        allOverrideDependencies = _analyzePubFile(
-          projectName: projectName,
-          pubSpecDep: pubSpec.dependencyOverrides,
-          old: allOverrideDependencies,
-        );
+            pubSpecDep: pubSpec.dependencies,
+            old: allDependencies,
+          );
+          allDevDependencies = _analyzePubFile(
+              projectName: projectName,
+              pubSpecDep: pubSpec.devDependencies,
+              old: allDevDependencies);
+          allOverrideDependencies = _analyzePubFile(
+            projectName: projectName,
+            pubSpecDep: pubSpec.dependencyOverrides,
+            old: allOverrideDependencies,
+          );
+        }
       }
 
       // Write repport

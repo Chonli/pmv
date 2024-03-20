@@ -5,17 +5,17 @@ repository: https://github.com/Chonli/pmv
 issue_tracker: https://github.com/Chonli/pmv/issues
 
 environment:
-  sdk: ^3.0.1
+  sdk: ^3.3.0
 
 # Add regular dependencies here.
 dependencies:
-  args: ^2.4.1
-  cli_completion: ^0.3.0
-  collection: ^1.17.2
+  args: ^2.4.2
+  cli_completion: ^0.5.0
+  collection: any
   glob: ^2.1.2
-  mason_logger: ^0.2.6
-  path: ^1.8.3
-  pub_updater: ^0.3.0
+  mason_logger: ^0.2.12
+  path: ^1.9.0
+  pub_updater: ^0.4.0
   pubspec: ^2.3.0
 
 dev_dependencies:
